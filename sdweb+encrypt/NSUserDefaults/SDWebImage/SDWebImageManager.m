@@ -107,8 +107,19 @@
     }];
 }
 
+//modify: SDWebImage 默认的方法
 - (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url
                                          options:(SDWebImageOptions)options
+                                        progress:(SDWebImageDownloaderProgressBlock)progressBlock
+                                       completed:(SDWebImageCompletionWithFinishedBlock)completedBlock {
+    
+    return [self downloadImageWithURL:url options:options isEncrypt:false progress:progressBlock completed:completedBlock];
+}
+
+// 为默认方法添加新的内容
+- (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url
+                                         options:(SDWebImageOptions)options
+                                       isEncrypt:(BOOL)isEncrypt
                                         progress:(SDWebImageDownloaderProgressBlock)progressBlock
                                        completed:(SDWebImageCompletionWithFinishedBlock)completedBlock {
     // Invoking this method without a completedBlock is pointless
@@ -179,7 +190,7 @@
                 // ignore image read from NSURLCache if image if cached but force refreshing
                 downloaderOptions |= SDWebImageDownloaderIgnoreCachedResponse;
             }
-            id <SDWebImageOperation> subOperation = [self.imageDownloader downloadImageWithURL:url options:downloaderOptions progress:progressBlock completed:^(UIImage *downloadedImage, NSData *data, NSError *error, BOOL finished) {
+            id <SDWebImageOperation> subOperation = [self.imageDownloader downloadImageWithURL:url options:downloaderOptions isEncrypt:isEncrypt progress:progressBlock completed:^(UIImage *downloadedImage, NSData *data, NSError *error, BOOL finished) {
                 if (weakOperation.isCancelled) {
                     // Do nothing if the operation was cancelled
                     // See #699 for more details
@@ -218,7 +229,7 @@
 
                             if (transformedImage && finished) {
                                 BOOL imageWasTransformed = ![transformedImage isEqual:downloadedImage];
-                                [self.imageCache storeImage:transformedImage recalculateFromImage:imageWasTransformed imageData:(imageWasTransformed ? nil : data) forKey:key toDisk:cacheOnDisk];
+                                [self.imageCache storeImage:transformedImage isEncrypt:isEncrypt recalculateFromImage:imageWasTransformed imageData:(imageWasTransformed ? nil : data) forKey:key toDisk:cacheOnDisk];
                             }
 
                             dispatch_main_sync_safe(^{
@@ -230,7 +241,7 @@
                     }
                     else {
                         if (downloadedImage && finished) {
-                            [self.imageCache storeImage:downloadedImage recalculateFromImage:NO imageData:data forKey:key toDisk:cacheOnDisk];
+                            [self.imageCache storeImage:downloadedImage isEncrypt:isEncrypt recalculateFromImage:NO imageData:data forKey:key toDisk:cacheOnDisk];
                         }
 
                         dispatch_main_sync_safe(^{

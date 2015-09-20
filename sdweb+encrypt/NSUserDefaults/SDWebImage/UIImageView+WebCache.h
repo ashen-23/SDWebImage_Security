@@ -42,7 +42,25 @@
 
  * @endcode
  */
+
+/// 是否需要加密 image 数据
+//typedef NS_ENUM(NSInteger,DataType){
+//    /// 本地不加密 image 数据
+//    dataTypeNone,
+//    /// 本地加密 image 数据
+//    dataTypeEncrypt
+//};
+
 @interface UIImageView (WebCache)
+
+// 添加属性判断是否需要加密,0表示正常,1表示 AES 加密
+@property(nonatomic,strong)NSNumber *dataType;
+
+- (void)sd_setImageAESWithURL:(NSURL *)url;
+- (void)sd_setImageAESWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder;
+- (void)sd_setImageAESWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options;
+
+
 
 /**
  * Get the current image URL.

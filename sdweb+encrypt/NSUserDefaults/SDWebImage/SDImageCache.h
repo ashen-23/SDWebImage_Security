@@ -125,6 +125,7 @@ typedef void(^SDWebImageCalculateSizeBlock)(NSUInteger fileCount, NSUInteger tot
  * Store an image into memory and optionally disk cache at the given key.
  *
  * @param image       The image to store
+ * @param isEncrypt   是否需要加密
  * @param recalculate BOOL indicates if imageData can be used or a new data should be constructed from the UIImage
  * @param imageData   The image data as returned by the server, this representation will be used for disk storage
  *                    instead of converting the given image object into a storable/compressed image format in order
@@ -132,7 +133,8 @@ typedef void(^SDWebImageCalculateSizeBlock)(NSUInteger fileCount, NSUInteger tot
  * @param key         The unique image cache key, usually it's image absolute URL
  * @param toDisk      Store the image to disk cache if YES
  */
-- (void)storeImage:(UIImage *)image recalculateFromImage:(BOOL)recalculate imageData:(NSData *)imageData forKey:(NSString *)key toDisk:(BOOL)toDisk;
+- (void)storeImage:(UIImage *)image isEncrypt:(BOOL)isEncrypt recalculateFromImage:(BOOL)recalculate imageData:(NSData *)imageData forKey:(NSString *)key toDisk:(BOOL)toDisk;
+//- (void)storeImage:(UIImage *)image recalculateFromImage:(BOOL)recalculate imageData:(NSData *)imageData forKey:(NSString *)key toDisk:(BOOL)toDisk;
 
 /**
  * Query the disk cache asynchronously.

@@ -196,7 +196,13 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
     return [paths[0] stringByAppendingPathComponent:fullNamespace];
 }
 
-- (void)storeImage:(UIImage *)image recalculateFromImage:(BOOL)recalculate imageData:(NSData *)imageData forKey:(NSString *)key toDisk:(BOOL)toDisk {
+//modify: storeImage
+//- (void)storeImage:(UIImage *)image recalculateFromImage:(BOOL)recalculate imageData:(NSData *)imageData forKey:(NSString *)key toDisk:(BOOL)toDisk {
+//    [];
+//}
+
+
+- (void)storeImage:(UIImage *)image isEncrypt:(BOOL)isEncrypt recalculateFromImage:(BOOL)recalculate imageData:(NSData *)imageData forKey:(NSString *)key toDisk:(BOOL)toDisk {
     if (!image || !key) {
         return;
     }
@@ -251,10 +257,12 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
                 // transform to NSUrl
                 NSURL *fileURL = [NSURL fileURLWithPath:cachePathForKey];
                 
-                //!!!: 这里是写入二进制文件文件,加密可以从这里加密
                 //debug 加密操作
-                [_fileManager createFileAtPath:cachePathForKey contents: [CryptorTools AESEncryptData:data keyString:AESKey iv:nil] attributes:nil];
-
+                CFAbsoluteTime start = CACurrentMediaTime();
+                NSData *dataNew = isEncrypt ? [CryptorTools AESEncryptData:data keyString:AESKey iv:nil] : data;
+                [_fileManager createFileAtPath:cachePathForKey contents:dataNew  attributes:nil];
+                NSLog(@"加密耗时:%f",CACurrentMediaTime()-start);
+                
                 // disable iCloud backup
                 if (self.shouldDisableiCloud) {
                     [fileURL setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:nil];
@@ -264,12 +272,13 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
     }
 }
 
+//??? :这两个函数在哪里调用?
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key {
-    [self storeImage:image recalculateFromImage:YES imageData:nil forKey:key toDisk:YES];
+    [self storeImage:image isEncrypt:false recalculateFromImage:YES imageData:nil forKey:key toDisk:YES];
 }
 
 - (void)storeImage:(UIImage *)image forKey:(NSString *)key toDisk:(BOOL)toDisk {
-    [self storeImage:image recalculateFromImage:YES imageData:nil forKey:key toDisk:toDisk];
+    [self storeImage:image isEncrypt:false recalculateFromImage:YES imageData:nil forKey:key toDisk:YES];
 }
 
 - (BOOL)diskImageExistsWithKey:(NSString *)key {
@@ -320,7 +329,16 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
     NSString *defaultPath = [self defaultCachePathForKey:key];
     NSData *data = [NSData dataWithContentsOfFile:defaultPath];
     if (data) {
-        //debug 解密操作
+//        //debug 解密操作
+//       CFTimeInterval start1 = CACurrentMediaTime();
+//        NSData *data2 = [NSData new];
+//        for (int i =0; i<10000; i++) {
+//             data2 = [CryptorTools AESDecryptData:data keyString:AESKey iv:nil];
+//        }
+//        NSLog(@"解密耗时:%f",CACurrentMediaTime()-start1);
+
+        //return data;
+        
         return [CryptorTools AESDecryptData:data keyString:AESKey iv:nil];
     }
 
@@ -330,6 +348,11 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
         NSData *imageData = [NSData dataWithContentsOfFile:filePath];
         if (imageData) {
             //debug 解密操作
+//            CFAbsoluteTime start = CFAbsoluteTimeGetCurrent();
+//            NSData *data2 = [CryptorTools DESDecryptData:data keyString:AESKey iv:nil];
+//            NSLog(@"解密,%f",CFAbsoluteTimeGetCurrent()-start);
+//            return data2;
+
             return [CryptorTools AESDecryptData:imageData keyString:AESKey iv:nil];
         }
     }
