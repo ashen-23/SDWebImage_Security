@@ -1,5 +1,8 @@
+
+![sj.png](./sj.png)
 # SDWebImage_Security
 SDWebImage 保存图片的加密操作(AES)
+
 
 ![QQ20150918-2.png](./QQ20150918-2.png)
 
