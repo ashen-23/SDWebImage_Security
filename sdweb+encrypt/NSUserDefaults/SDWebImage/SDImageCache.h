@@ -36,6 +36,9 @@ typedef void(^SDWebImageCalculateSizeBlock)(NSUInteger fileCount, NSUInteger tot
  */
 @interface SDImageCache : NSObject
 
+- (NSOperation *)queryDiskCacheForKey:(NSString *)key isEncrypt:(BOOL)isEncrtpt done:(SDWebImageQueryCompletedBlock)doneBlock;
+
+
 /**
  * Decompressing images that are downloaded and cached can improve performance but can consume lot of memory.
  * Defaults to YES. Set this to NO if you are experiencing a crash due to excessive memory consumption.

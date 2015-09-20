@@ -259,8 +259,10 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
                 
                 //debug 加密操作
                 CFAbsoluteTime start = CACurrentMediaTime();
-                NSData *dataNew = isEncrypt ? [CryptorTools AESEncryptData:data keyString:AESKey iv:nil] : data;
-                [_fileManager createFileAtPath:cachePathForKey contents:dataNew  attributes:nil];
+                if (isEncrypt) { // 加密保存
+                    data = [CryptorTools AESEncryptData:data keyString:AESKey iv:nil];
+                }
+                [_fileManager createFileAtPath:cachePathForKey contents:data  attributes:nil];
                 NSLog(@"加密耗时:%f",CACurrentMediaTime()-start);
                 
                 // disable iCloud backup
@@ -325,7 +327,7 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
 }
 
 //!!!: 从硬盘加载图片
-- (NSData *)diskImageDataBySearchingAllPathsForKey:(NSString *)key {
+- (NSData *)diskImageDataBySearchingAllPathsForKey:(NSString *)key isEncrypt:(BOOL)isEncrypt{
     NSString *defaultPath = [self defaultCachePathForKey:key];
     NSData *data = [NSData dataWithContentsOfFile:defaultPath];
     if (data) {
@@ -338,8 +340,7 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
 //        NSLog(@"解密耗时:%f",CACurrentMediaTime()-start1);
 
         //return data;
-        
-        return [CryptorTools AESDecryptData:data keyString:AESKey iv:nil];
+        return isEncrypt ? [CryptorTools AESDecryptData:data keyString:AESKey iv:nil] : data;
     }
 
     NSArray *customPaths = [self.customPaths copy];
@@ -352,16 +353,19 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
 //            NSData *data2 = [CryptorTools DESDecryptData:data keyString:AESKey iv:nil];
 //            NSLog(@"解密,%f",CFAbsoluteTimeGetCurrent()-start);
 //            return data2;
-
             return [CryptorTools AESDecryptData:imageData keyString:AESKey iv:nil];
         }
     }
-
     return nil;
 }
 
+//modify: 从硬盘加载
 - (UIImage *)diskImageForKey:(NSString *)key {
-    NSData *data = [self diskImageDataBySearchingAllPathsForKey:key];
+   return [self diskImageForKey:key isEncrypt:NO];
+}
+
+- (UIImage *)diskImageForKey:(NSString *)key isEncrypt:(BOOL)isEncrypt {
+    NSData *data = [self diskImageDataBySearchingAllPathsForKey:key isEncrypt:isEncrypt];
     if (data) {
         UIImage *image = [UIImage sd_imageWithData:data];
         image = [self scaledImageForKey:key image:image];
@@ -379,7 +383,12 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
     return SDScaledImageForKey(key, image);
 }
 
+//modify: queryDiskCacheForKey检查硬盘中是否存在
 - (NSOperation *)queryDiskCacheForKey:(NSString *)key done:(SDWebImageQueryCompletedBlock)doneBlock {
+    return [self queryDiskCacheForKey:key isEncrypt:false done:doneBlock];
+}
+
+- (NSOperation *)queryDiskCacheForKey:(NSString *)key isEncrypt:(BOOL)isEncrtpt done:(SDWebImageQueryCompletedBlock)doneBlock {
     if (!doneBlock) {
         return nil;
     }
@@ -395,7 +404,8 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
         doneBlock(image, SDImageCacheTypeMemory);
         return nil;
     }
-
+    
+    // 从硬盘检查
     NSOperation *operation = [NSOperation new];
     dispatch_async(self.ioQueue, ^{
         if (operation.isCancelled) {
@@ -403,7 +413,7 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
         }
 
         @autoreleasepool {
-            UIImage *diskImage = [self diskImageForKey:key];
+            UIImage *diskImage = [self diskImageForKey:key isEncrypt:isEncrtpt];
             if (diskImage && self.shouldCacheImagesInMemory) {
                 NSUInteger cost = SDCacheCostForImage(diskImage);
                 [self.memCache setObject:diskImage forKey:key cost:cost];

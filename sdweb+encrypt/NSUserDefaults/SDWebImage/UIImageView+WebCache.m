@@ -17,38 +17,55 @@ static char TAG_ACTIVITY_SHOW;
 
 @implementation UIImageView (WebCache)
 
-- (void)sd_setImageAESWithURL:(NSURL *)url {
-    //SDWebImageCompletionBlock block = ^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL){
-        
-    //};
-    [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:nil];
+//-------------------------------重写方法
+//modify: sd_setImageAESWithURL
+- (void)sd_AESSetImageWithURL:(NSURL *)url {
+    [self sd_setImageWithURL:url placeholderImage:nil options:0 isEncrypt:YES progress:nil completed:nil];
 }
 
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:options isEncrypt:YES progress:nil completed:nil];
+}
 
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder {
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 isEncrypt:YES progress:nil completed:nil];
+}
 
+- (void)sd_AESSetImageWithURL:(NSURL *)url completed:(SDWebImageCompletionBlock)completedBlock {
+    [self sd_setImageWithURL:url placeholderImage:nil options:0 isEncrypt:YES progress:nil completed:completedBlock];
+}
 
+-(void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletionBlock)completedBlock {
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:options isEncrypt:YES progress:nil completed:completedBlock];
+}
+
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletionBlock)completedBlock {
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 isEncrypt:YES progress:nil completed:completedBlock];
+}
+
+//--------------------------------
 
 - (void)sd_setImageWithURL:(NSURL *)url {
-    [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:nil];
+    [self sd_setImageWithURL:url placeholderImage:nil options:0 isEncrypt:false progress:nil completed:nil];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder {
-    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:nil];
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 isEncrypt:false progress:nil completed:nil];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
-    [self sd_setImageWithURL:url placeholderImage:placeholder options:options progress:nil completed:nil];
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:options isEncrypt:false progress:nil completed:nil];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url completed:(SDWebImageCompletionBlock)completedBlock {
-    [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:completedBlock];
+    [self sd_setImageWithURL:url placeholderImage:nil options:0 isEncrypt:false progress:nil completed:completedBlock];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletionBlock)completedBlock {
-    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:completedBlock];
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 isEncrypt:false progress:nil completed:completedBlock];
 }
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletionBlock)completedBlock {
-    [self sd_setImageWithURL:url placeholderImage:placeholder options:options progress:nil completed:completedBlock];
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:options isEncrypt:false progress:nil completed:completedBlock];
 }
 
 /// SDWebImage 默认的方法
@@ -60,7 +77,6 @@ static char TAG_ACTIVITY_SHOW;
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options isEncrypt:(BOOL)isEncrypt progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock {
     [self sd_cancelCurrentImageLoad]; // 取消队列
     objc_setAssociatedObject(self, &imageURLKey, url, OBJC_ASSOCIATION_RETAIN_NONATOMIC); // runtime, 添加属性
-
     if (!(options & SDWebImageDelayPlaceholder)) {
         dispatch_main_async_safe(^{
             self.image = placeholder;

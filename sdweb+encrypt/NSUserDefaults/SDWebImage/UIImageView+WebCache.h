@@ -54,11 +54,14 @@
 @interface UIImageView (WebCache)
 
 // 添加属性判断是否需要加密,0表示正常,1表示 AES 加密
-@property(nonatomic,strong)NSNumber *dataType;
+//@property(nonatomic,strong)NSNumber *dataType;
 
-- (void)sd_setImageAESWithURL:(NSURL *)url;
-- (void)sd_setImageAESWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder;
-- (void)sd_setImageAESWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options;
+- (void)sd_AESSetImageWithURL:(NSURL *)url;
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder;
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options;
+- (void)sd_AESSetImageWithURL:(NSURL *)url completed:(SDWebImageCompletionBlock)completedBlock;
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletionBlock)completedBlock;
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletionBlock)completedBlock;
 
 
 
@@ -161,7 +164,8 @@
  *                       indicating if the image was retrieved from the local cache or from the network.
  *                       The fourth parameter is the original image url.
  */
-- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock;
+//modify 注释该方法
+//- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock;
 
 /**
  * Set the imageView `image` with an `url` and optionally a placeholder image.
