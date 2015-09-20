@@ -110,7 +110,7 @@
 		46413FDF1BAC0FEF00549D2F /* sdweb+encrypt */ = {
 			isa = PBXGroup;
 			children = (
-				46413FFE1BAC103900549D2F /* NSUserDefaults */,
+				46413FFE1BAC103900549D2F /* SDWeb_AES */,
 				46413FE31BAC0FEF00549D2F /* AppDelegate.h */,
 				46413FE41BAC0FEF00549D2F /* AppDelegate.m */,
 				46413FE61BAC0FEF00549D2F /* ViewController.h */,
@@ -132,13 +132,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		46413FFE1BAC103900549D2F /* NSUserDefaults */ = {
+		46413FFE1BAC103900549D2F /* SDWeb_AES */ = {
 			isa = PBXGroup;
 			children = (
 				464140051BAC103F00549D2F /* SDWebImage */,
 				46413FFF1BAC103900549D2F /* CryptorTools.h */,
 				464140001BAC103900549D2F /* CryptorTools.m */,
 			);
+			name = SDWeb_AES;
 			path = NSUserDefaults;
 			sourceTree = "<group>";
 		};

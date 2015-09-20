@@ -23,12 +23,12 @@ static char TAG_ACTIVITY_SHOW;
     [self sd_setImageWithURL:url placeholderImage:nil options:0 isEncrypt:YES progress:nil completed:nil];
 }
 
-- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
-    [self sd_setImageWithURL:url placeholderImage:placeholder options:options isEncrypt:YES progress:nil completed:nil];
-}
-
 - (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder {
     [self sd_setImageWithURL:url placeholderImage:placeholder options:0 isEncrypt:YES progress:nil completed:nil];
+}
+
+- (void)sd_AESSetImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:options isEncrypt:YES progress:nil completed:nil];
 }
 
 - (void)sd_AESSetImageWithURL:(NSURL *)url completed:(SDWebImageCompletionBlock)completedBlock {
